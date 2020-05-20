@@ -22,6 +22,7 @@ public class GreetingController {
 	}
 	
 	//https://reqres.in/ Este método llama a esta API que simula datos.
+	//http://localhost:8080/user?id=2
 	
 	@GetMapping("/user")
 	public void getUser(@RequestParam String id) {
