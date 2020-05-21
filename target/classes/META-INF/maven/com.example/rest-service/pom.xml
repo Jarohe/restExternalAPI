@@ -47,7 +47,19 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
-			</dependency>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.google.code.gson</groupId> -->
+		<!-- <artifactId>gson</artifactId> -->
+		<!-- </dependency> -->
+
+		<!-- Logback -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>runtime</scope>
+
+		</dependency>
 	</dependencies>
 
 	<build>
