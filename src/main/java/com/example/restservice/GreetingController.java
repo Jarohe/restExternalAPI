@@ -1,6 +1,7 @@
 package com.example.restservice;
 
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.ws.rs.client.Client;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +31,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 @RestController
 public class GreetingController {
@@ -98,9 +102,8 @@ public class GreetingController {
 			RestTemplate restTemplate = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders(); // es importante añadir los headers ya que sin esto nos da un 403 Forbidden
 			headers.setAccept(Arrays.asList(org.springframework.http.MediaType.APPLICATION_JSON));
-			headers.add("user-agent",
-					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
-
+			headers.add(Constants.HEADER_USER_AGENT_NAME,Constants.HEADER_USER_AGENT_VALUE);
+			
 			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 			result = restTemplate.exchange(Constants.ENDPOINT.concat(user), HttpMethod.GET, entity, String.class);
 			
@@ -134,6 +137,43 @@ public class GreetingController {
 		long finish = System.currentTimeMillis();
 		logger.info("END - getListUsers " + Util.getFormatElapsedTime(finish - start));
 		return json;
+	}
+	
+	@PostMapping(
+			  value = "/createUser", consumes = "application/json", produces = "application/json")
+	public String createUser(@RequestBody String request) {
+		String result = null;
+		
+		try {
+			
+			RestTemplate restTemplate = new RestTemplate();
+			
+			HttpHeaders headers = new HttpHeaders(); // es importante añadir los headers ya que sin esto nos da un 403 Forbidden
+			headers.setAccept(Arrays.asList(org.springframework.http.MediaType.APPLICATION_JSON));
+			headers.add(Constants.HEADER_USER_AGENT_NAME,Constants.HEADER_USER_AGENT_VALUE);
+			
+			HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+			result = restTemplate.postForObject(Constants.ENDPOINT, entity, String.class);
+					//restTemplate.postForEntity(Constants.ENDPOINT, entity, String.class); //puedes comprobar estado
+					//return String restTemplate.postForObject(Constants.ENDPOINT, entity, String.class); MAS RAPIDO QUE LOS DEMAS PERO NO PUEDES COMPROBAR ESTADO
+//					// return ResponseEntity<String> restTemplate.exchange(Constants.ENDPOINT,  HttpMethod.POST, entity, String.class); puedes comprobar estado
+			
+//			if (result.getStatusCodeValue() != 201) {
+//				logger.error("Status request: " + result.getStatusCodeValue());
+//			} else {
+//				logger.debug(result.getBody());
+//			}
+			
+			// Ejemplo uso GSon ver valor del JSON
+			Gson gson = new Gson();
+			Properties properties = gson.fromJson(result, Properties.class);
+			String id = properties.get("id").toString();
+			logger.debug("id "+id);
+			logger.debug(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }
